@@ -52,6 +52,7 @@ func receiveJSONHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(wordyapi.ParseText(t))
 }
+
 //go:embed static
 var staticAssets embed.FS
 
@@ -61,11 +62,11 @@ func main() {
 	r.Post("/api", receiveJSONHandler)
 
 	// serves up our static content like html
-	staticFS,err:=fs.Sub(staticAssets, "static")
-	if err!=nil {
+	staticFS, err := fs.Sub(staticAssets, "static")
+	if err != nil {
 		log.Fatal(err)
 	}
-	r.Get("/*",http.FileServer(http.FS(staticFS)).ServeHTTP)
+	r.Get("/*", http.FileServer(http.FS(staticFS)).ServeHTTP)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8888", r))
