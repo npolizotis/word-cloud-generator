@@ -1,16 +1,17 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"html/template"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"net/http"
 
-	rice "github.com/GeertJohan/go.rice"
-	mux "github.com/gorilla/mux"
-	"github.com/wickett/word-cloud-generator/wordyapi"
+	"github.com/go-chi/chi/v5"
+	"github.com/npolizotis/word-cloud-generator/wordyapi"
 )
 
 // TextSubmission is a json title and string to submit
@@ -51,14 +52,20 @@ func receiveJSONHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(wordyapi.ParseText(t))
 }
+//go:embed static
+var staticAssets embed.FS
 
 func main() {
-	r := mux.NewRouter()
+	r := chi.NewRouter()
 	// routes
-	r.HandleFunc("/api", receiveJSONHandler).Methods("POST")
+	r.Post("/api", receiveJSONHandler)
 
 	// serves up our static content like html
-	r.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("static").HTTPBox()))
+	staticFS,err:=fs.Sub(staticAssets, "static")
+	if err!=nil {
+		log.Fatal(err)
+	}
+	r.Get("/*",http.FileServer(http.FS(staticFS)).ServeHTTP)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8888", r))

@@ -20,9 +20,6 @@ run:
 start-mac: build
 	./artifacts/osx/word-cloud-generator
 
-rice:
-	@rice embed-go
-
 goconvey-install:
 	@go install github.com/smartystreets/goconvey
 
@@ -30,8 +27,8 @@ goconvey:
 	$$GOPATH/bin/goconvey -port=9999
 
 godep:
-	@echo "Restoring dependencies..."
-	@godep restore
+	@echo "Downloading modules..."
+	@go mod download
 
 build:
 	@echo "Creating compiled builds in ./artifacts"
