@@ -21,6 +21,6 @@ func TestParseText(t *testing.T) {
 
 	// test to make sure it counted the variations of capitalization
 	if v["test"].(float64) != 7 {
-		t.Error("Expected 7 occurances of test, but got:", v)
+		t.Error("Expected 7 occurances of test, but got:", v["test"])
 	}
 }
